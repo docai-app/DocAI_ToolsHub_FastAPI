@@ -1,6 +1,7 @@
 from PIL import Image, ImageEnhance, ImageOps
 import cv2
 import numpy as np
+from pyzbar.pyzbar import decode
 
 def preprocess_image(image):
     gray_image = ImageOps.grayscale(image)
@@ -26,4 +27,17 @@ def decode_qrcode(image):
                     },
                 }
             )
+    return qrcodes
+
+def decode_qrcode_with_pyzbar(image):
+    decoded_objects = decode(image)
+    qrcodes = []
+    for obj in decoded_objects:
+        qrcodes.append({
+            "type": obj.type,
+            "data": obj.data.decode('utf-8'),
+            "position": {
+                "points": [point for point in obj.polygon]  # 使用 points 而不是 rect
+            }
+        })
     return qrcodes
