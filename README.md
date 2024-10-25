@@ -65,6 +65,9 @@ docker-compose up --build
 - **POST /api/v1/qrcode/info**: 提取QR碼信息。
   - 請求體：包含一個名為`file`的圖像文件。
 
+- **POST /api/v1/qrcode/info/pyzbar**: 使用pyzbar提取QR碼信息。
+  - 請求體：包含一個名為`file`的圖像文件。
+
 ## 代碼參考
 
 - `routers/arxiv_router.py`: 定義arXiv API的路由。
