@@ -4,6 +4,7 @@ from typing import List
 import os
 import io
 from PIL import Image
+import mimetypes
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -39,8 +40,23 @@ async def read_text(request: ImageUrlsRequest):
 @router.post("/read/upload")
 async def read_text_from_upload(file: UploadFile = File(...)):
     try:
-        # 直接傳遞文件對象給服務
-        text = await ocr_service.read_text_from_image(file.file)
+        print(f"處理上傳文件: {file.filename}, 內容類型: {file.content_type}")
+        
+        # 讀取文件內容
+        contents = await file.read()
+        print(f"已讀取文件，大小: {len(contents)} bytes")
+        
+        # 獲取文件MIME類型（優先使用內容類型，其次使用文件名檢測）
+        mime_type = file.content_type
+        if not mime_type:
+            mime_type, _ = mimetypes.guess_type(file.filename)
+            print(f"根據文件名猜測的MIME類型: {mime_type}")
+        
+        # 調用 OCR 服務處理文件
+        # 注意: 我們現在不再區分 PDF 和圖像，使用簡化的處理方法
+        print(f"調用 OCR 服務處理文件...")
+        text = await ocr_service.read_text_from_image(contents)
+        print(f"OCR 處理完成，提取的文本長度: {len(text)}")
         
         return {
             "success": True,
@@ -49,4 +65,7 @@ async def read_text_from_upload(file: UploadFile = File(...)):
             }
         }
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        # 記錄詳細錯誤信息
+        error_msg = str(e)
+        print(f"OCR 處理錯誤: {error_msg}")
+        raise HTTPException(status_code=500, detail=error_msg) 
