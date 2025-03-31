@@ -7,3 +7,5 @@ Pillow
 python-multipart
 pyzbar
 pdf2image
+azure-cognitiveservices-vision-computervision
+python-dotenv
